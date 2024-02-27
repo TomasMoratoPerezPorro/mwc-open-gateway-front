@@ -10,30 +10,35 @@ export type UseOptionsOptions<T, ApiType = unknown> = {
 	transform: (data: ApiType) => T;
 };
 
-export type UseQueryReturn<T> = {
+export type UseQueryReturn<T, E> = {
 	data: T | undefined;
-	isError: boolean;
+	error: E | null;
 	isLoading: boolean;
 };
 
-export type UseQueryAction<S> = {
-	type: 'data' | 'loading' | 'error';
-	payload: S | boolean;
-};
+export type UseQueryAction<S, E> = {
+  type: "request"
+} | {
+  type: "success", payload: S
+} | {
+  type: "error", payload: E
+}
 
-function getInitialState<T>(): UseQueryReturn<T> {
+function getInitialState<T, E>(): UseQueryReturn<T, E> {
 	return {
 		data: undefined,
-		isError: false,
+		error: null,
 		isLoading: false,
 	};
 }
 
-function reducer<T>(state: UseQueryReturn<T>, action: UseQueryAction<T>) {
+function reducer<T, E>(state: UseQueryReturn<T, E>, action: UseQueryAction<T, E>) {
+	switch (action.type) {
+		
 	if (action.type === 'data' && typeof action.payload !== 'boolean') {
-		return { ...state, data: action.payload, error: false, isLoading: false };
+		return { ...state, data: action.payload, error: null, isLoading: false };
 	} else if (action.type === 'loading' && typeof action.payload === 'boolean') {
-		return { ...state, error: false, isLoading: action.payload };
+		return { ...state, error: null, isLoading: action.payload };
 	} else if (action.type === 'error' && typeof action.payload === 'boolean') {
 		return { ...state, data: undefined, isError: action.payload, isLoading: false };
 	}
@@ -48,7 +53,7 @@ export function useQuery<T, ApiType extends UnknownRecord>({
 	skip,
 }: UseOptionsOptions<T, ApiType>): UseQueryReturn<T> {
 	const { CLIENT_ID: clientId, middlewareBaseUrl: baseDlx, ...config } = useConfig();
-	const [{ data, isLoading, isError }, dispatch] = useReducer<Reducer<UseQueryReturn<T>, UseQueryAction<T>>>(
+	const [{ data, isLoading, error }, dispatch] = useReducer<Reducer<UseQueryReturn<T>, UseQueryAction<T>>>(
 		reducer,
 		getInitialState()
 	);
@@ -70,5 +75,5 @@ export function useQuery<T, ApiType extends UnknownRecord>({
 		}
 	}, [dispatch]);
 
-	return { data, isLoading, isError };
+	return { data, isLoading, error };
 }

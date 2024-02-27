@@ -1,5 +1,7 @@
 import './App.css'
 import { Results } from './components/Results'
+import { Fetch } from './components/fetch'
+import { Table } from './components/table'
 import { ConfigProvider } from './context/config-context'
 import { useQuery } from './hooks/use-query'
 import { GetUserElementResponse, UserElement } from './types/dtos'
@@ -11,34 +13,33 @@ function App() {
     getUsersEndpoint: process.env.PUBLIC_GET_USERS ?? '',
     // Add more variables as needed
   }
-  const {
-    data: userList,
-    isLoading: isLoading,
-    isError: isError,
-  } = useQuery({
+  const query = useQuery({
     key: 'PUBLIC_GET_USERS',
     transform: transformConfig,
   })
 
   return (
-    <ConfigProvider config={envConfig}>
-      <div className="App">
-        <h1>TEST</h1>
-        <main>
-          {userList &&
-            userList.length > 0 &&
-            userList.map((user: UserElement) => <>{user.firstName}</>)}
+    <div className="App">
+      <h1>TEST</h1>
+      <main>
+        <Fetch
+          {...query}
+          loadingComponent={<strong>Cargando...</strong>}
+          errorComponent={<p>Ha habido un error</p>}
+        >
+          {(data) => {
+            if (data.length === 0) return <p>No hay usuarios</p>
 
-          {isLoading && <strong>Cargando...</strong>}
-
-          {isError && <p>Ha habido un error</p>}
-
-          {!isLoading && !isError && userList && userList.length === 0 && (
-            <p>No hay usuarios</p>
-          )}
-        </main>
-      </div>
-    </ConfigProvider>
+            return (
+              <Table
+                headers={['Id', 'Username', 'Email', 'Phone Number']}
+                data={data}
+              />
+            )
+          }}
+        </Fetch>
+      </main>
+    </div>
   )
 }
 
