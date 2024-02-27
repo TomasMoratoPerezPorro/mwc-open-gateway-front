@@ -27,7 +27,7 @@ function App() {
           loadingComponent={<strong>Cargando...</strong>}
           errorComponent={<p>Ha habido un error</p>}
         >
-          {(data) => {
+          {(data: GetUserElementResponse) => {
             if (data.length === 0) return <p>No hay usuarios</p>
 
             return (

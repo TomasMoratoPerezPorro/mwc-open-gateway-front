@@ -19,14 +19,6 @@ export type UseFetchReducerState<T, E> = {
   error: E | null
 }
 
-function getInitialState<T, E>(): UseFetchReducerState<T, E> {
-  return {
-    data: null,
-    isLoading: false,
-    error: null,
-  }
-}
-
 function reducer<T, E>(
   state: UseFetchReducerState<T, E>,
   action: UseFetchAction<T, E>
@@ -58,7 +50,11 @@ function reducer<T, E>(
 }
 
 export function useFetchReducer<T, E>(
-  initialState: UseFetchReducerState<T, E>
+  initialState: UseFetchReducerState<T, E> = {
+    data: null,
+    isLoading: false,
+    error: null,
+  }
 ): [UseFetchReducerState<T, E>, Dispatch<UseFetchAction<T, E>>] {
   return useReducer<Reducer<UseFetchReducerState<T, E>, UseFetchAction<T, E>>>(
     reducer,

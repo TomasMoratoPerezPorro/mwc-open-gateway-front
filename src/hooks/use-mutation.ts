@@ -1,7 +1,7 @@
-import { Reducer, useMemo, useReducer } from 'react'
+import { useMemo } from 'react'
 import { http } from '../utils/http'
-import { ApiError, dtoUtils } from '../types/utilities'
 import { useConfig } from '../context/config-context'
+import { UseFetchReducerState, useFetchReducer } from './use-fetch-reducer'
 
 export type HTTPMethod = keyof typeof http
 
@@ -13,12 +13,6 @@ export type UseOptionsOptions<T, ApiType = unknown> = {
 }
 
 export type UnknownRecord = Record<string, unknown>
-
-export type UseMutationReturn<T, E> = {
-  data: T | null
-  error: E | null
-  isLoading: boolean
-}
 
 type FetchFnParams<
   T extends UnknownRecord,
@@ -32,55 +26,21 @@ type FetchFnParams<
 
 export type UseMutationHookReturn<T, E> = [
   (arg?: FetchFnParams<UnknownRecord, Record<string, string>>) => Promise<void>,
-  UseMutationReturn<T, E>,
+  UseFetchReducerState<T, E>,
 ]
 
-export type UseMutationAction<S, E> = {
-  type: "request"
-} | {
-  type: "success", payload: S
-} | {
-  type: "error", payload: E
-}
-
-function getInitialState<T, E>(): UseMutationReturn<T, E> {
-  return {
-    data: null,
-    isLoading: false,
-    error: null,
-  }
-}
-
-function reducer<T, E>(
-  state: UseMutationReturn<T, E>,
-  action: UseMutationAction<T, E>
-): UseMutationReturn<T, E> {
-  switch (action.type) {
-    case 'request':
-      return {
-        ...state,
-        isLoading: true,
-        error: null,
-        data: null
-      }
-    case 'success': 
-      return {
-        ...state,
-        data: action.payload,
-        error: null,
-      }
-    case 'error':
-      return {
-        ...state,
-        isLoading: false,
-        error: action.payload,
-        data: null
-      }
-      default:
-        return state
+export type UseMutationAction<S, E> =
+  | {
+      type: 'request'
     }
-  }
-
+  | {
+      type: 'success'
+      payload: S
+    }
+  | {
+      type: 'error'
+      payload: E
+    }
 
 function paramsToUrl(params: Record<string, string>) {
   return `?${Object.entries(params)
@@ -94,15 +54,17 @@ function getMutationParams<P>(params?: string | P): string {
 }
 
 // A very quick pseudo-use-mutation
-export function useMutation<T, E = Error, ApiType extends UnknownRecord = UnknownRecord>({
+export function useMutation<
+  T,
+  E = Error,
+  ApiType extends UnknownRecord = UnknownRecord,
+>({
   key,
   transform = (data: ApiType) => data as unknown as T,
   url,
   method: apiMethod = 'post',
 }: UseOptionsOptions<T, ApiType>): UseMutationHookReturn<T, E> {
-  const [{ data, isLoading, error }, dispatch] = useReducer<
-    Reducer<UseMutationReturn<T, E>, UseMutationAction<T, E>>
-  >(reducer, getInitialState())
+  const [state, dispatch] = useFetchReducer<T, E>()
 
   const { baseDlx, ...config } = useConfig()
 
@@ -132,5 +94,5 @@ export function useMutation<T, E = Error, ApiType extends UnknownRecord = Unknow
     }
   }, [dispatch])
 
-  return [execute, { data, isLoading, error }]
+  return [execute, state]
 }
