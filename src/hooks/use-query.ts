@@ -5,27 +5,24 @@ import { UseFetchReducerState, useFetchReducer } from './use-fetch-reducer';
 
 
 export type UseOptionsOptions<T, ApiType = unknown> = {
-	key: string;
-	url?: string;
+	url: string;
 	skip?: boolean;
 	transform?: (data: ApiType) => T;
 };
 
 // A very quick pseudo-use-query
 export function useQuery<T, E = Error, ApiType extends UnknownRecord = UnknownRecord>({
-	key,
 	transform,
 	url = '',
-	skip,
+	skip = false,
 }: UseOptionsOptions<T, ApiType>): UseFetchReducerState<T, E> {
-	const { CLIENT_ID: clientId, middlewareBaseUrl: baseDlx, ...config } = useConfig();
 	
 	const [state, dispatch] = useFetchReducer<T, E>()
 
 	const doFetch = async () => {
 		dispatch({ type: 'request' });
 		try {
-			const response = await http.get<ApiType>(config, `${baseDlx}/${config[key]}${url}`, {
+			const response = await http.get<ApiType>({}, `${url}`, {
 				headers: { 'Content-Type': 'application/json' },
 			});
 			dispatch({ type: 'success', payload: transform ? transform(response) : response as unknown as T });
