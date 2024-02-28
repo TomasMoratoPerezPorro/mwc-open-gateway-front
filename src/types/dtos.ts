@@ -50,7 +50,7 @@ export interface Vehicle {
 }
 
 export interface Route {
-  route_id: number;
+  route_id: string;
   start_coordinates_latitude: number;
   start_coordinates_longitude: number;
   end_coordinates_latitude: number;

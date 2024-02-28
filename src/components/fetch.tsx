@@ -1,4 +1,4 @@
-import { cloneElement } from 'react'
+import { cloneElement, useEffect } from 'react'
 
 import type { ReactElement, ReactNode } from 'react'
 
@@ -20,8 +20,17 @@ export function Fetch<T = any, E = any>({
   loadingComponent,
   children,
 }: FetchProps<T, E>): ReactNode {
+
+  useEffect(() => {
+    console.log('data', data)
+  }, [data])
+  
   const isError = error !== null
   const hasData = data !== null
+
+  useEffect(() => {
+    console.log('hasData', hasData)
+  }, [hasData])
 
   if (isError && errorComponent) {
     return typeof errorComponent === 'function'
