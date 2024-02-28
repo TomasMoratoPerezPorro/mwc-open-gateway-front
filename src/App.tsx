@@ -6,7 +6,8 @@ import { useAuth } from './hooks/auth-context'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import LayoutWrapper from './components/Layout'
+import LayoutWrapper from './components/LayoutWrapper'
+import Drivers from './pages/Drivers'
 
 function App() {
   const { signOut, user } = useAuth()
@@ -16,8 +17,11 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route element={<AuthRoute />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
+          <Route element={<LayoutWrapper />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/drivers" element={<Drivers />} />
+          </Route>
         </Route>
       </Routes>
     </>
