@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useAuth } from '../hooks/auth-context'
 import { useQuery } from '../hooks/use-query'
 import { Route } from '../types/dtos'
-import { Fetch } from '../components/fetch'
+// import { Fetch } from '../components/fetch'
 import { Table, TableProps } from 'antd'
+import RoutesTable from '../components/RoutesTable'
 
 export const transformConfig = ({ data }: { data: Route[] }): DataType[] =>
   data.map((item) => ({
@@ -78,11 +79,25 @@ const columns: TableProps<DataType>['columns'] = [
 
 const Home = () => {
   const { user } = useAuth()
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   const { data, isLoading, error } = useQuery({
     url: 'http://localhost:3000/routes',
     transform: transformConfig,
   })
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   if (error ) {
     return <p>Ha habido un error</p>
@@ -93,7 +108,7 @@ const Home = () => {
   }
 
   if (data) {
-    return <Table columns={columns} dataSource={data} />
+    return <RoutesTable data={data} />
   }
 }
 
