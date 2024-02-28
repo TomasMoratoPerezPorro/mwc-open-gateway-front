@@ -12,8 +12,8 @@ export const transformConfig = ({ data }: { data: Route[] }): DataType[] =>
     start_coordinates_latitude: item.start_coordinates_latitude,
     start_coordinates_longitude: item.start_coordinates_longitude,
     // Uncomment and add other properties as needed
-    // end_coordinates_latitude: item.end_coordinates_latitude,
-    // end_coordinates_longitude: item.end_coordinates_longitude,
+    end_coordinates_latitude: item.end_coordinates_latitude,
+    end_coordinates_longitude: item.end_coordinates_longitude,
     // pickup_time: item.pickup_time,
     // drop_time: item.drop_time,
   }))
@@ -22,8 +22,8 @@ interface DataType {
   route_id: string
   start_coordinates_latitude: number
   start_coordinates_longitude: number
-  // end_coordinates_latitude: number
-  // end_coordinates_longitude: number
+  end_coordinates_latitude: number
+  end_coordinates_longitude: number
   // pickup_time: string
   // drop_time: string
 }

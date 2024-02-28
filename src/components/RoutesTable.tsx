@@ -3,7 +3,8 @@ import { useAuth } from '../hooks/auth-context'
 import { useQuery } from '../hooks/use-query'
 import { Route } from '../types/dtos'
 // import { Fetch } from '../components/fetch'
-import { Modal, Table, TableProps } from 'antd'
+import { Modal, Table, TableProps, Space } from 'antd'
+import AddRouteModal from '../pages/AddRoute'
 
 export const transformConfig = ({ data }: { data: Route[] }): DataType[] =>
   data.map((item) => ({
@@ -11,8 +12,8 @@ export const transformConfig = ({ data }: { data: Route[] }): DataType[] =>
     start_coordinates_latitude: item.start_coordinates_latitude,
     start_coordinates_longitude: item.start_coordinates_longitude,
     // Uncomment and add other properties as needed
-    // end_coordinates_latitude: item.end_coordinates_latitude,
-    // end_coordinates_longitude: item.end_coordinates_longitude,
+    end_coordinates_latitude: item.end_coordinates_latitude,
+    end_coordinates_longitude: item.end_coordinates_longitude,
     // pickup_time: item.pickup_time,
     // drop_time: item.drop_time,
   }))
@@ -21,8 +22,8 @@ interface DataType {
   route_id: string
   start_coordinates_latitude: number
   start_coordinates_longitude: number
-  // end_coordinates_latitude: number
-  // end_coordinates_longitude: number
+  end_coordinates_latitude: number
+  end_coordinates_longitude: number
   // pickup_time: string
   // drop_time: string
 }
@@ -54,6 +55,26 @@ const RoutesTable = (props: RouteTableProps) => {
       dataIndex: 'start_coordinates_longitude',
       key: 'start_coordinates_longitude',
     },
+    {
+        title: 'End Longitude',
+        dataIndex: 'end_coordinates_latitude',
+        key: 'end_coordinates_latitude',
+      },
+      {
+        title: 'End Latitude',
+        dataIndex: 'end_coordinates_longitude',
+        key: 'end_coordinates_longitude',
+      },
+      {
+        title: 'Actions',
+        key: 'actions',
+        render: (_, record) => (
+            <Space size="middle">
+              <a >Check Location</a>
+              <a>Verify Arrival</a>
+            </Space>
+          ),
+      },
   ]
 
   const showModal = (route: DataType) => {
@@ -86,13 +107,15 @@ const RoutesTable = (props: RouteTableProps) => {
             <p>Start Latitude: {selectedRoute.start_coordinates_latitude}</p>
             <p>Start Longitude: {selectedRoute.start_coordinates_longitude}</p>
             {/* Uncomment and add other properties as needed */}
-            {/* <p>End Latitude: {selectedRoute.end_coordinates_latitude}</p> */}
-            {/* <p>End Longitude: {selectedRoute.end_coordinates_longitude}</p> */}
+            <p>End Latitude: {selectedRoute.end_coordinates_latitude}</p>
+            <p>End Longitude: {selectedRoute.end_coordinates_longitude}</p>
+            
             {/* <p>Pickup Time: {selectedRoute.pickup_time}</p> */}
             {/* <p>Drop Time: {selectedRoute.drop_time}</p> */}
           </>
         )}
       </Modal>
+      <AddRouteModal/>
     </>
   )
 }
