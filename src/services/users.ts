@@ -1,10 +1,5 @@
-const delay = async (ms: number) =>
-  await new Promise((resolve) => setTimeout(resolve, ms))
-
 export const fetchUsers = async () => {
-  await delay(300)
-
-  return await fetch(`https://api.example.com/user`)
+  return await fetch(`http://localhost:3000/users`)
     .then(async (res) => {
       if (!res.ok) throw new Error('Error en la petición')
       return await res.json()
@@ -12,7 +7,21 @@ export const fetchUsers = async () => {
 
     .then((res) => {
       return {
-        users: res.results,
+        users: res,
+      }
+    })
+}
+
+export const fetchUsersByRoleFestival = async () => {
+  return await fetch(`http://localhost:3000/users/festival/10000000-0000-0000-0000-000000000002/00000000-0000-0000-0000-000000000001`)
+    .then(async (res) => {
+      if (!res.ok) throw new Error('Error en la petición')
+      return await res.json()
+    })
+
+    .then((res) => {
+      return {
+        users: res,
       }
     })
 }
