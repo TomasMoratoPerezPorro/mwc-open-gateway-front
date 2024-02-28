@@ -1,7 +1,7 @@
-import { Reducer, useMemo, useReducer } from 'react'
+import { useMemo } from 'react'
 import { http } from '../utils/http'
-import { ApiError, dtoUtils } from '../types/utilities'
 import { useConfig } from '../context/config-context'
+import { UseFetchReducerState, useFetchReducer } from './use-fetch-reducer'
 
 export type HTTPMethod = keyof typeof http
 
@@ -14,13 +14,6 @@ export type UseOptionsOptions<T, ApiType = unknown> = {
 
 export type UnknownRecord = Record<string, unknown>
 
-export type UseMutationReturn<T> = {
-  data: T | undefined
-  isError: boolean
-  isLoading: boolean
-  error: ApiError | null
-}
-
 type FetchFnParams<
   T extends UnknownRecord,
   P extends Record<string, string>,
@@ -31,65 +24,23 @@ type FetchFnParams<
   method?: HTTPMethod
 }
 
-export type UseMutationHookReturn<T> = [
+export type UseMutationHookReturn<T, E> = [
   (arg?: FetchFnParams<UnknownRecord, Record<string, string>>) => Promise<void>,
-  UseMutationReturn<T>,
+  UseFetchReducerState<T, E>,
 ]
 
-export type UseMutationAction<S> = {
-  type: 'data' | 'loading' | 'error' | 'errorObj'
-  payload: S | boolean | ApiError | null
-}
-
-function getInitialState<T>(): UseMutationReturn<T> {
-  return {
-    data: undefined,
-    isError: false,
-    isLoading: false,
-    error: null,
-  }
-}
-
-function reducer<T>(
-  state: UseMutationReturn<T>,
-  action: UseMutationAction<T>
-): UseMutationReturn<T> {
-  if (
-    action.type === 'data' &&
-    typeof action.payload !== 'boolean' &&
-    action.payload !== undefined
-  ) {
-    return {
-      ...state,
-      data: action.payload as T,
-      isError: false,
-      isLoading: false,
-      error: null,
+export type UseMutationAction<S, E> =
+  | {
+      type: 'request'
     }
-  } else if (action.type === 'loading' && typeof action.payload === 'boolean') {
-    return { ...state, isLoading: action.payload }
-  } else if (action.type === 'error' && typeof action.payload === 'boolean') {
-    return {
-      ...state,
-      data: undefined,
-      isError: action.payload,
-      isLoading: false,
-      error: null,
+  | {
+      type: 'success'
+      payload: S
     }
-  } else if (
-    action.type === 'errorObj' &&
-    dtoUtils.isApiError(action.payload)
-  ) {
-    return {
-      ...state,
-      data: undefined,
-      isError: true,
-      isLoading: false,
-      error: action.payload,
+  | {
+      type: 'error'
+      payload: E
     }
-  }
-  return state
-}
 
 function paramsToUrl(params: Record<string, string>) {
   return `?${Object.entries(params)
@@ -103,15 +54,17 @@ function getMutationParams<P>(params?: string | P): string {
 }
 
 // A very quick pseudo-use-mutation
-export function useMutation<T, ApiType extends UnknownRecord>({
+export function useMutation<
+  T,
+  E = Error,
+  ApiType extends UnknownRecord = UnknownRecord,
+>({
   key,
   transform = (data: ApiType) => data as unknown as T,
   url,
   method: apiMethod = 'post',
-}: UseOptionsOptions<T, ApiType>): UseMutationHookReturn<T> {
-  const [{ data, isLoading, isError, error }, dispatch] = useReducer<
-    Reducer<UseMutationReturn<T>, UseMutationAction<T>>
-  >(reducer, getInitialState())
+}: UseOptionsOptions<T, ApiType>): UseMutationHookReturn<T, E> {
+  const [state, dispatch] = useFetchReducer<T, E>()
 
   const { baseDlx, ...config } = useConfig()
 
@@ -120,7 +73,7 @@ export function useMutation<T, ApiType extends UnknownRecord>({
       T extends UnknownRecord,
       P extends Record<string, string>,
     >(arg?: FetchFnParams<T, P>) {
-      dispatch({ type: 'loading', payload: true })
+      dispatch({ type: 'request' })
 
       try {
         const { body, params, param, method = apiMethod } = arg ?? {}
@@ -134,25 +87,12 @@ export function useMutation<T, ApiType extends UnknownRecord>({
             headers: { 'Content-Type': 'application/json' },
           }
         )
-        dispatch({ type: 'data', payload: transform(response) })
+        dispatch({ type: 'success', payload: transform(response) })
       } catch (error) {
-        if (dtoUtils.isApiError(error)) {
-          dispatch({
-            type: 'errorObj',
-            payload: {
-              description: error.description,
-              message: error.message,
-              error: error.error,
-              status: error.status,
-            },
-          })
-        } else {
-          dispatch({ type: 'error', payload: true })
-        }
+        dispatch({ type: 'error', payload: error as E })
       }
-      dispatch({ type: 'loading', payload: false })
     }
   }, [dispatch])
 
-  return [execute, { data, isLoading, isError, error }]
+  return [execute, state]
 }
