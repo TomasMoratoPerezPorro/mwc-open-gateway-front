@@ -22,21 +22,21 @@ export function useQuery<T, E = Error, ApiType extends UnknownRecord = UnknownRe
 	
 	const [state, dispatch] = useFetchReducer<T, E>()
 
+	const doFetch = async () => {
+		dispatch({ type: 'request' });
+		try {
+			const response = await http.get<ApiType>(config, `${baseDlx}/${config[key]}${url}`, {
+				headers: { 'Content-Type': 'application/json' },
+			});
+			dispatch({ type: 'success', payload: transform ? transform(response) : response as unknown as T });
+		} catch (error) {
+			dispatch({ type: 'error', payload: error as E });
+		}
+	}
+
 	useEffect(() => {
 		if (!skip) {
-			(async function () {
-				dispatch({ type: 'request' });
-				try {
-					const response = await http.get<ApiType>(config, `${baseDlx}/${config[key]}${url}`, {
-						headers: { 'Content-Type': 'application/json' },
-					});
-					
-
-					dispatch({ type: 'success', payload: transform ? transform(response) : response as unknown as T });
-				} catch (error) {
-					dispatch({ type: 'error', payload: error as E });
-				}
-			})();
+			doFetch();
 		}
 	}, [dispatch]);
 

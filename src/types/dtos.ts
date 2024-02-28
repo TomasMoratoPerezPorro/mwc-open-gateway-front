@@ -13,6 +13,21 @@ export interface RouteStatus {
   status_name: string;
 }
 
+export enum Gender {
+  Female = 'female',
+  Male = 'male',
+}
+
+export enum Title {
+  MS = 'Ms',
+  Madame = 'Madame',
+  Mademoiselle = 'Mademoiselle',
+  Miss = 'Miss',
+  Monsieur = 'Monsieur',
+  Mr = 'Mr',
+  Mrs = 'Mrs',
+}
+
 export interface User {
   user_id: number;
   username: string;

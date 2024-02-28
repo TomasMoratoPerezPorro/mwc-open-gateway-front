@@ -8,10 +8,10 @@ import { ChakraProvider } from '@chakra-ui/react'
 
 const queryClient = new QueryClient()
 
-function Root({ children }) {
+function Root() {
   return (
     <ChakraProvider>
-      <ConfigProvider config={}>
+      <ConfigProvider config={import.meta.env as Record<string, string>}>
         <App />
       </ConfigProvider>
     </ChakraProvider>
