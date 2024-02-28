@@ -9,6 +9,7 @@ import AuthRoute from './components/AuthRoute'
 import Home from './pages/Home'
 import Register from './pages/Register'
 import Login from './pages/Login'
+import AddRoute from './pages/AddRoute'
 import { Button } from 'antd'
 import { useAuth } from './hooks/auth-context'
 
@@ -24,6 +25,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
           </Route>
+          <Route path="/addRoute" element={<AddRoute />} />
         </Routes>
         <Button onClick={signOut}>LogOut</Button>
       </div>
