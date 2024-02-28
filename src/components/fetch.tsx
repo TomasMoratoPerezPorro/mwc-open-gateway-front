@@ -20,17 +20,15 @@ export function Fetch<T = any, E = any>({
   loadingComponent,
   children,
 }: FetchProps<T, E>): ReactNode {
-
   useEffect(() => {
     console.log('data', data)
   }, [data])
-  
+
   const isError = error !== null
-  const hasData = data !== null
 
   useEffect(() => {
-    console.log('hasData', hasData)
-  }, [hasData])
+    console.log('data !== null', data !== null)
+  }, [data])
 
   if (isError && errorComponent) {
     return typeof errorComponent === 'function'
@@ -42,7 +40,9 @@ export function Fetch<T = any, E = any>({
     return loadingComponent
   }
 
-  if (hasData) {
+  if (data !== null) {
+    console.log('typeof children === function', typeof children === 'function')
+
     return typeof children === 'function'
       ? children(data)
       : cloneElement(children, { data })
