@@ -24,3 +24,24 @@ header {
 .pointer {
   cursor: crosshair;
 }
+
+.App {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .App {
+    padding: 2rem 3rem;
+  }
+}
+
+.App > main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
