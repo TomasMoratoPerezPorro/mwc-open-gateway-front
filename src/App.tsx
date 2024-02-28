@@ -1,33 +1,26 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-import { Results } from './components/Results'
-import { ConfigProvider } from './context/config-context'
-import { useQuery } from './hooks/use-query'
-import { supabase } from './services/supabaseClient'
-import { Route, Routes } from 'react-router-dom'
-import AuthRoute from './components/AuthRoute'
-import Home from './pages/Home'
-import Register from './pages/Register'
-import Login from './pages/Login'
 import { Button } from 'antd'
+import { Route, Routes } from 'react-router-dom'
+import './App.css'
+import AuthRoute from './components/AuthRoute'
 import { useAuth } from './hooks/auth-context'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import LayoutWrapper from './components/Layout'
 
 function App() {
-  const { signOut } = useAuth()
+  const { signOut, user } = useAuth()
   return (
-    <div style={{ minHeight: '100vh' }}>
-      <div className="w-100" style={{ maxWidth: '400px' }}>
-        <Routes>
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route element={<AuthRoute />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home />} />
-          </Route>
-        </Routes>
-        <Button onClick={signOut}>LogOut</Button>
-      </div>
-    </div>
+    <>
+      <Routes>
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route element={<AuthRoute />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
+        </Route>
+      </Routes>
+    </>
   )
 }
 
