@@ -36,6 +36,7 @@ function reducer<T, E>(
         ...state,
         data: action.payload,
         error: null,
+        isLoading: false
       }
     case 'error':
       return {
