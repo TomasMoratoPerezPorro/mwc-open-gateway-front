@@ -1,12 +1,13 @@
 import ReactDOM from 'react-dom/client'
 import App from './App'
+import AuthProvider from './hooks/auth-context'
 import './index.css'
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ConfigProvider } from './context/config-context'
-
-const queryClient = new QueryClient()
+import { BrowserRouter } from 'react-router-dom'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <App />
+  <AuthProvider>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </AuthProvider>
 )

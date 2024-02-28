@@ -5,44 +5,44 @@ export default function Auth() {
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState('')
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
+  const handleLogin = async (e: any) => {
+    e.preventDefault()
 
-    setLoading(true)
-    const { error } = await supabase.auth.signInWithOtp({ email })
-
-    if (error) {
-      alert(error.message)
-    } else {
+    try {
+      setLoading(true)
+      const { error } = await supabase.auth.signInWithOtp({ email })
+      if (error) throw error
       alert('Check your email for the login link!')
+    } catch (error) {
+      alert((error as any)?.message)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
-    <div className="row flex flex-center">
-      <div className="col-6 form-widget">
-        <h1 className="header">Supabase + React</h1>
-        <p className="description">
-          Sign in via magic link with your email below
-        </p>
-        <form className="form-widget" onSubmit={handleLogin}>
-          <div>
-            <input
-              className="inputField"
-              type="email"
-              placeholder="Your email"
+    <div className="container mx-auto text-center w-72">
+      <div className="col-6 form-widget" aria-live="polite">
+        <h1 className="header text-3xl py-3 text-gray-600">Login in</h1>
+        <p className="text-xs text-gray-500 pb-3">Sign in via magic link with your email below</p>
+        {loading ? (
+          'Sending magic link...'
+        ) : (
+          <form onSubmit={handleLogin}>
+            <input type="email" 
+              name="email" 
+              className="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1" 
+              placeholder="your@email.com"
+              id="website"
               value={email}
-              required={true}
               onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <button className={'button block'} disabled={loading}>
-              {loading ? <span>Loading</span> : <span>Send magic link</span>}
-            </button>
-          </div>
-        </form>
+              />
+               <button className="my-3 w-36 text-xs h-8 rounded-full text-gray-50 bg-indigo-600 hover:bg-indigo-700" >
+               Send magic link
+              </button>
+            
+          </form>
+        )}
       </div>
     </div>
   )

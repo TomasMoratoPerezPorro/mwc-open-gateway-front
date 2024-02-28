@@ -1,44 +1,33 @@
+import { useEffect, useState } from 'react'
 import './App.css'
 import { Results } from './components/Results'
 import { ConfigProvider } from './context/config-context'
 import { useQuery } from './hooks/use-query'
-import { GetUserElementResponse, UserElement } from './types/dtos'
-
-export const transformConfig = ({ data }: GetUserElementResponse) => data
+import { supabase } from './services/supabaseClient'
+import { Route, Routes } from 'react-router-dom'
+import AuthRoute from './components/AuthRoute'
+import Home from './pages/Home'
+import Register from './pages/Register'
+import Login from './pages/Login'
+import { Button } from 'antd'
+import { useAuth } from './hooks/auth-context'
 
 function App() {
-  const envConfig = {
-    getUsersEndpoint: process.env.PUBLIC_GET_USERS ?? '',
-    // Add more variables as needed
-  }
-  const {
-    data: userList,
-    isLoading: isLoading,
-    isError: isError,
-  } = useQuery({
-    key: 'PUBLIC_GET_USERS',
-    transform: transformConfig,
-  })
-
+  const { signOut } = useAuth()
   return (
-    <ConfigProvider config={envConfig}>
-      <div className="App">
-        <h1>TEST</h1>
-        <main>
-          {userList &&
-            userList.length > 0 &&
-            userList.map((user: UserElement) => <>{user.firstName}</>)}
-
-          {isLoading && <strong>Cargando...</strong>}
-
-          {isError && <p>Ha habido un error</p>}
-
-          {!isLoading && !isError && userList && userList.length === 0 && (
-            <p>No hay usuarios</p>
-          )}
-        </main>
+    <div style={{ minHeight: '100vh' }}>
+      <div className="w-100" style={{ maxWidth: '400px' }}>
+        <Routes>
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route element={<AuthRoute />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+          </Route>
+        </Routes>
+        <Button onClick={signOut}>LogOut</Button>
       </div>
-    </ConfigProvider>
+    </div>
   )
 }
 
